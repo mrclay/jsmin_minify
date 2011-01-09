@@ -70,34 +70,30 @@ class JSMin {
     protected $output      = '';
 
     /**
-     * Minify Javascript
+     * Minify Javascript.
      *
      * @param string $js Javascript to be minified
      * @return string
      */
     public static function minify($js)
     {
-        // look out for syntax like "++ +" and "- ++"
-        $p = '\\+';
-        $m = '\\-';
-        if (preg_match("/([$p$m])(?:\\1 [$p$m]| (?:$p$p|$m$m))/", $js)) {
-            // likely pre-minified and would be broken by JSMin
-            return $js;
-        }
         $jsmin = new JSMin($js);
         return $jsmin->min();
     }
 
-    /*
-     * Don't create a JSMin instance, instead use the static function minify,
-     * which checks for mb_string function overloading and avoids errors
-     * trying to re-minify the output of Closure Compiler
-     *
-     * @private
+    /**
+     * @param string $input
      */
     public function __construct($input)
     {
         $this->input = $input;
+        // look out for syntax like "++ +" and "- ++"
+        $p = '\\+';
+        $m = '\\-';
+        if (preg_match("/([$p$m])(?:\\1 [$p$m]| (?:$p$p|$m$m))/", $input)) {
+            // likely pre-minified and would be broken by JSMin
+            $this->output = $input;
+        }
     }
 
     /**
